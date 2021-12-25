@@ -1,8 +1,39 @@
 import './Header.scss'
 import logo from '../../images/logo.png'
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 function Header() {
+    const [ searchModal, setSerachModal ] = useState({
+        display: "none"
+    })
+    const [ products, setProducts ] = useState([])
+    const [ cart, setCart ] = useState('')
+    
+    const searchClick = () => {
+        if (searchModal.display === 'none') {
+            setSerachModal({
+                display: "block"
+            })
+        } else {
+            setSerachModal({
+                display: "none"
+            })
+        }        
+    }
+    
+    const cartClick = () => {
+        const product = window.localStorage.getItem('product')
+        if (product) {
+            setProducts(JSON.parse(product))
+        }
+        if (!cart) {
+            setCart('on')            
+        } else {
+            setCart('')
+        }
+    }
+
     return (
         <>
         <header className="main-header">
@@ -36,54 +67,44 @@ function Header() {
                     </div>
                     <div className="attr-nav">
                         <ul>
-                            <li className="search"><Link to="#"><i className="fa fa-search"></i></Link></li>
+                            <li className="search"><Link to="#" onClick={searchClick}><i className="fa fa-search"></i></Link></li>
                             <li className="side-menu">
-                                <Link to="#">
+                                <Link to="#" onClick={cartClick}>
                                     <i className="fa fa-shopping-bag"></i>
-                                    <span className="badge">3</span>
+                                    <span className="badge">{products ? products.length : 0}</span>
                                     <p>My Cart</p>
                                 </Link>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div className="side">
-                    <Link to="#" className="close-side"><i className="fa fa-times"></i></Link>
+                <div className={`side ${cart}`}>
+                    <Link to="#" className="close-side" onClick={() => setCart('')} ><i className="fa fa-times"></i></Link>
                     <li className="cart-box">
-                        <ul className="cart-list">
-                            <li>
-                                <Link to="#" className="photo"><img src="images/img-pro-01.jpg" className="cart-thumb"
-                                        alt="" /></Link>
-                                <h6><Link to="#">Delica omtantur </Link></h6>
-                                <p>1x - <span className="price">$80.00</span></p>
-                            </li>
-                            <li>
-                                <Link to="#" className="photo"><img src="images/img-pro-02.jpg" className="cart-thumb"
-                                        alt="" /></Link>
-                                <h6><Link to="#">Omnes ocurreret</Link></h6>
-                                <p>1x - <span className="price">$60.00</span></p>
-                            </li>
-                            <li>
-                                <Link to="#" className="photo"><img src="images/img-pro-03.jpg" className="cart-thumb"
-                                        alt="" /></Link>
-                                <h6><Link to="#">Agam facilisis</Link></h6>
-                                <p>1x - <span className="price">$40.00</span></p>
-                            </li>
-                            <li className="total">
-                                <Link to="#" className="btn btn-default hvr-hover btn-cart">VIEW CART</Link>
-                                <span className="float-right"><strong>Total</strong>: $180.00</span>
-                            </li>
-                        </ul>
+                        {products.length ? 
+                            <ul className="cart-list">
+                                {products.map(p => {
+                                    return (
+                                        <li key={p.product_name}>
+                                            <Link to="#" className="photo"><img src="images/img-pro-01.jpg" className="cart-thumb"
+                                                    alt="" /></Link>
+                                            <h6><Link to="#">{p.product_name}</Link></h6>
+                                            <p><span className="price">{p.product_price}</span></p>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        : []}
                     </li>
                 </div>
             </nav>
         </header>
-        <div className="top-search">
+        <div className="top-search" style={searchModal} >
             <div className="container">
                 <div className="input-group">
                     <span className="input-group-addon"><i className="fa fa-search"></i></span>
                     <input type="text" className="form-control" placeholder="Search" />
-                    <span className="input-group-addon close-search"><i className="fa fa-times"></i></span>
+                    <span className="input-group-addon close-search" onClick={() => setSerachModal({ display: 'none' })}><i className="fa fa-times"></i></span>
                 </div>
             </div>
         </div>
